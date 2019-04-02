@@ -1,40 +1,40 @@
 const express = require('express');
 const passport = require('passport');
-const Customer = require('../models/customer');
+const Address = require('../models/address');
 
 const router = express.Router();
 
 // Auth
 const jwtAuth = passport.authenticate('jwt', { session: false });
 
-// Get all Customers
+// Get all Addresses
 router.get('/', jwtAuth, (req, res) => {
-  return Customer.find()
-    .then(customers => {
-      res.status(200).json(customers);
+  return Address.find()
+    .then(addresses => {
+      res.status(200).json(addresses);
     })
     .catch(err => {
         res.status(500).json(err);
     });
 });
 
-// Get Customer by ID
+// Get Address by ID
 router.get('/:id', jwtAuth, (req, res) => {
     const {id} = req.params;
-    return Customer.findOne({_id: id})
-        .then(customer => {
-            res.status(200).json(customer);
+    return Address.findOne({_id: id})
+        .then(address => {
+            res.status(200).json(address);
         })
         .catch(err => {
             res.status(500).json(err);
         })
 });
 
-// Update Customer by ID
+// Update Address by ID
 router.put('/:id', jsonParser, jwtAuth, (req, res) => {
     const {id} = req.params;
     const toUpdate = {};
-    const updateableFields = ['firstName', 'lastName', 'authorizedUsers', 'companyName', 'phoneNumbers', 'emailAddress', 'notes', 'instructions'];
+    const updateableFields = ['address', 'city', 'state', 'zip', 'community', 'notes', 'isBilling'];
 
     updateableFields.forEach(field => {
         if (field in req.body) {
@@ -42,7 +42,7 @@ router.put('/:id', jsonParser, jwtAuth, (req, res) => {
         }
     });
 
-    return Customer.findOneAndUpdate({_id: id}, toUpdate, {new: true})
+    return Address.findOneAndUpdate({_id: id}, toUpdate, {new: true})
         .then(results => {
             res.status(200).json(results);
         })
@@ -51,34 +51,34 @@ router.put('/:id', jsonParser, jwtAuth, (req, res) => {
         }); 
 });
 
-// Create new Customer
+// Create new Address
 router.post('/', jsonParser, jwtAuth, (req, res) => {
-    const {firstName, lastName, authorizedUsers = [], companyName = '', phoneNumbers, emailAddress, notes = [], instructions = ''} = req.body;
+    const {customerId, address, city, state, zip, community, notes = [], isBilling} = req.body;
     
-    return Customer.find({ $or: [{firstName, lastName}, {emailAddress}] })
+    return Address.find({address})
         .count()
         .then(count => {
             if(count > 0) {
                 return Promise.reject({
                     code: 422,
                     reason: 'ValidationError',
-                    message: 'Customer already exists',
-                    location: 'Customer'
+                    message: 'Address already exists',
+                    location: 'Address'
                 });
             }
-            return Customer.create({
-                firstName, 
-                lastName,
-                authorizedUsers,
-                companyName,
-                phoneNumbers,
-                emailAddress,
+            return Address.create({
+                customerId,
+                address,
+                city,
+                state,
+                zip,
+                community,
                 notes,
-                instructions
+                isBilling
             })
         })
-        .then(customer => {
-            res.status(201).json(customer);
+        .then(address => {
+            res.status(201).json(address);
         })
         .catch(err => {
             if(err.reason === 'ValidationError') {
@@ -88,10 +88,10 @@ router.post('/', jsonParser, jwtAuth, (req, res) => {
         });    
 });
 
-// Delete Customer by ID
+// Delete Address by ID
 router.delete('/:id', jwtAuth, (req, res) => {
   const {id} = req.params;
-  return Customer.findOneAndDelete({id_: id})
+  return Address.findOneAndDelete({id_: id})
     .then(() => {
         res.status(202).json('deleted');
     })

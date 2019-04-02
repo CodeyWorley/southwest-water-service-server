@@ -1,19 +1,23 @@
 const mongoose = require("mongoose");
 
 const ProductSchema = mongoose.Schema({
-    name: {
-      type: String,
-      required: true
-    },
-    price: {
-      type: String,
-      required: true
-    },
-    description: {
-      type: String,
-      required: true
-    }
-  });
+  name: {
+    type: String,
+    required: true
+  },
+  type: {
+    type: {String, enum: ['Reverse Osmosis', 'Water Softener', 'Water Heater', 'Sink', 'Garbage Disposal']},
+    required: true
+  },
+  price: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String,
+    required: true
+  }
+});
 
 ProductSchema.set("toJSON", {
   virtuals: true,

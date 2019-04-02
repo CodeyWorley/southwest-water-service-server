@@ -7,12 +7,19 @@ const ServiceSchema = mongoose.Schema({
     required: true
   },
   type: {
-    type: {String, enum: ['Service', 'Salt', 'Misc']},
+    type: {String, enum: ['Reverse Osmosis', 'Water Softener', 'Salt']},
     required: true
   },
-  description: {
+  notes: {
+    type: Array
+  },
+  frequency: {
     type: String,
-    unique: true
+    required: true
+  },
+  status: {
+    type: {String, enum: ['Ongoing', 'Paused']},
+    required: true
   }
 });
 

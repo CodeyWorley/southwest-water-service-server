@@ -1,40 +1,40 @@
 const express = require('express');
 const passport = require('passport');
-const Customer = require('../models/customer');
+const Contract = require('../models/contract');
 
 const router = express.Router();
 
 // Auth
 const jwtAuth = passport.authenticate('jwt', { session: false });
 
-// Get all Customers
+// Get all Contracts
 router.get('/', jwtAuth, (req, res) => {
-  return Customer.find()
-    .then(customers => {
-      res.status(200).json(customers);
+  return Contract.find()
+    .then(contracts => {
+      res.status(200).json(contracts);
     })
     .catch(err => {
         res.status(500).json(err);
     });
 });
 
-// Get Customer by ID
+// Get Contract by ID
 router.get('/:id', jwtAuth, (req, res) => {
     const {id} = req.params;
-    return Customer.findOne({_id: id})
-        .then(customer => {
-            res.status(200).json(customer);
+    return Contract.findOne({_id: id})
+        .then(contract => {
+            res.status(200).json(contract);
         })
         .catch(err => {
             res.status(500).json(err);
         })
 });
 
-// Update Customer by ID
+// Update Contract by ID
 router.put('/:id', jsonParser, jwtAuth, (req, res) => {
     const {id} = req.params;
     const toUpdate = {};
-    const updateableFields = ['firstName', 'lastName', 'authorizedUsers', 'companyName', 'phoneNumbers', 'emailAddress', 'notes', 'instructions'];
+    const updateableFields = ['type', 'notes', 'frequency', 'status'];
 
     updateableFields.forEach(field => {
         if (field in req.body) {
@@ -42,7 +42,7 @@ router.put('/:id', jsonParser, jwtAuth, (req, res) => {
         }
     });
 
-    return Customer.findOneAndUpdate({_id: id}, toUpdate, {new: true})
+    return Contract.findOneAndUpdate({_id: id}, toUpdate, {new: true})
         .then(results => {
             res.status(200).json(results);
         })
@@ -51,34 +51,31 @@ router.put('/:id', jsonParser, jwtAuth, (req, res) => {
         }); 
 });
 
-// Create new Customer
+// Create new Contract
 router.post('/', jsonParser, jwtAuth, (req, res) => {
-    const {firstName, lastName, authorizedUsers = [], companyName = '', phoneNumbers, emailAddress, notes = [], instructions = ''} = req.body;
+    const {customerId, type, notes = [], frequency, status} = req.body;
     
-    return Customer.find({ $or: [{firstName, lastName}, {emailAddress}] })
+    return Contract.find({customerId, type})
         .count()
         .then(count => {
             if(count > 0) {
                 return Promise.reject({
                     code: 422,
                     reason: 'ValidationError',
-                    message: 'Customer already exists',
-                    location: 'Customer'
+                    message: 'Contract type already exists',
+                    location: 'Contract'
                 });
             }
-            return Customer.create({
-                firstName, 
-                lastName,
-                authorizedUsers,
-                companyName,
-                phoneNumbers,
-                emailAddress,
+            return Contract.create({
+                customerId,
+                type,
                 notes,
-                instructions
+                frequency,
+                status
             })
         })
-        .then(customer => {
-            res.status(201).json(customer);
+        .then(contract => {
+            res.status(201).json(contract);
         })
         .catch(err => {
             if(err.reason === 'ValidationError') {
@@ -88,10 +85,10 @@ router.post('/', jsonParser, jwtAuth, (req, res) => {
         });    
 });
 
-// Delete Customer by ID
+// Delete Contract by ID
 router.delete('/:id', jwtAuth, (req, res) => {
   const {id} = req.params;
-  return Customer.findOneAndDelete({id_: id})
+  return Contract.findOneAndDelete({id_: id})
     .then(() => {
         res.status(202).json('deleted');
     })

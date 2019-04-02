@@ -9,7 +9,7 @@ const jsonParser = bodyParser.json();
 
 // Register a new user
 router.post('/', jsonParser, (req, res) => {
-  const requiredFields = ['username', 'password', 'emailAddress'];
+  const requiredFields = ['userName', 'password', 'emailAddress', 'firstName', 'lastName', 'type'];
   const missingField = requiredFields.find(field => !(field in req.body));
 
   if (missingField) {
@@ -21,7 +21,7 @@ router.post('/', jsonParser, (req, res) => {
     });
   }
 
-  const stringFields = ['username', 'password', 'emailAddress'];
+  const stringFields = ['userName', 'password', 'emailAddress', 'firstName', 'lastName'];
   const nonStringField = stringFields.find(
     field => field in req.body && typeof req.body[field] !== 'string'
   );
@@ -35,7 +35,7 @@ router.post('/', jsonParser, (req, res) => {
     });
   }
 
-  const explicityTrimmedFields = ['username', 'password'];
+  const explicityTrimmedFields = ['userName', 'password', 'firstName', 'lastName'];
   const nonTrimmedField = explicityTrimmedFields.find(
     field => req.body[field].trim() !== req.body[field]
   );
@@ -50,7 +50,7 @@ router.post('/', jsonParser, (req, res) => {
   }
 
   const sizedFields = {
-    username: {
+    userName: {
       min: 1
     },
     password: {
@@ -82,26 +82,24 @@ router.post('/', jsonParser, (req, res) => {
     });
   }
 
-  let {username, password, emailAddress} = req.body;
+  let {userName, password, emailAddress} = req.body;
 
-  return User.find({username})
+  return User.find({userName})
     .count()
     .then(count => {
       if (count > 0) {
-        // There is an existing user with the same username
         return Promise.reject({
           code: 422,
           reason: 'ValidationError',
           message: 'Username already taken',
-          location: 'username'
+          location: 'userName'
         });
       }
-      // If there is no existing user, hash the password
       return User.hashPassword(password);
     })
     .then(hash => {
       return User.create({
-        username,
+        userName,
         password: hash,
         emailAddress
       });
@@ -110,8 +108,6 @@ router.post('/', jsonParser, (req, res) => {
       return res.status(201).json(user.serialize());
     })
     .catch(err => {
-      // Forward validation errors on to the client, otherwise give a 500
-      // error because something unexpected has happened
       if (err.reason === 'ValidationError') {
         return res.status(err.code).json(err);
       }

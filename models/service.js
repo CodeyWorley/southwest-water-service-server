@@ -7,20 +7,20 @@ const ServiceSchema = mongoose.Schema({
     required: true
   },
   type: {
-    type: {String, enum: ['Installation', 'Service', 'Misc', 'Quote']},
+    type: {String, enum: ['Installation', 'Service', 'Misc']},
     required: true
   },
   price: {
-    type: String
+    type: Number
   },
   description: {
     type: String
   },
-  dateScheduled: {
+  scheduledDate: {
     type: String,
     required: true
   },
-  timeScheduled: {
+  scheduledTime: {
     type: String,
     required: true
   },
