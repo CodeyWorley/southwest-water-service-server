@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 
 const UserSchema = mongoose.Schema({
-  username: {
+  userName: {
     type: String,
     required: true,
     unique: true
@@ -13,18 +13,33 @@ const UserSchema = mongoose.Schema({
     type: String,
     required: true
   },
+  firstName: {
+    type: String,
+    required: true
+  },
+  lastName: {
+    type: String,
+    required: true
+  },
   emailAddress: {
     type: String,
     required: true,
     unique: true
+  },
+  type: {
+    type: {String, enum: ['admin', 'technician', 'manager']},
+    required: true
   }
 });
 
 UserSchema.methods.serialize = function() {
   return {
     id: this._id,
-    username: this.username || '',
-    emailAddress: this.emailAddress || ''
+    userName: this.userName,
+    emailAddress: this.emailAddress,
+    firstName: this.firstName,
+    lastName: this.lastName,
+    type: this.type
   };
 };
 
