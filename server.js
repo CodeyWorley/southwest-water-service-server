@@ -5,6 +5,11 @@ const mongoose = require('mongoose');
 const morgan = require('morgan');
 const passport = require('passport');
 
+const addressesRouter = require('./routes/address');
+const contractsRouter = require('./routes/contract');
+const customersRouter = require('./routes/customer');
+const productsRouter = require('./routes/product');
+const servicesRouter = require('./routes/service');
 const { router: usersRouter } = require('./users');
 const { router: authRouter, localStrategy, jwtStrategy } = require('./auth');
 
@@ -31,6 +36,11 @@ app.use(express.json());
 passport.use(localStrategy);
 passport.use(jwtStrategy);
 
+app.use('/api/addresses/', addressesRouter);
+app.use('/api/contracts/', contractsRouter);
+app.use('/api/customers/', customersRouter);
+app.use('/api/products/', productsRouter);
+app.use('/api/services/', servicesRouter);
 app.use('/api/users/', usersRouter);
 app.use('/api/auth/', authRouter);
 
