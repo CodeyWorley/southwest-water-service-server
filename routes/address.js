@@ -1,4 +1,5 @@
 const express = require('express');
+const jsonParser = require('body-parser');
 const passport = require('passport');
 const Address = require('../models/address');
 

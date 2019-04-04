@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const {User} = require('../models/user');
+const User = require('../models/user');
 
 const router = express.Router();
 
@@ -9,7 +9,7 @@ const jsonParser = bodyParser.json();
 
 // Register a new user
 router.post('/', jsonParser, (req, res) => {
-  const requiredFields = ['userName', 'password', 'emailAddress', 'firstName', 'lastName', 'type'];
+  const requiredFields = ['username', 'password', 'emailAddress', 'firstName', 'lastName', 'type'];
   const missingField = requiredFields.find(field => !(field in req.body));
 
   if (missingField) {
@@ -21,7 +21,7 @@ router.post('/', jsonParser, (req, res) => {
     });
   }
 
-  const stringFields = ['userName', 'password', 'emailAddress', 'firstName', 'lastName'];
+  const stringFields = ['username', 'password', 'emailAddress', 'firstName', 'lastName'];
   const nonStringField = stringFields.find(
     field => field in req.body && typeof req.body[field] !== 'string'
   );
@@ -35,7 +35,7 @@ router.post('/', jsonParser, (req, res) => {
     });
   }
 
-  const explicityTrimmedFields = ['userName', 'password', 'firstName', 'lastName'];
+  const explicityTrimmedFields = ['username', 'password', 'firstName', 'lastName'];
   const nonTrimmedField = explicityTrimmedFields.find(
     field => req.body[field].trim() !== req.body[field]
   );
@@ -50,7 +50,7 @@ router.post('/', jsonParser, (req, res) => {
   }
 
   const sizedFields = {
-    userName: {
+    username: {
       min: 1
     },
     password: {
@@ -82,9 +82,9 @@ router.post('/', jsonParser, (req, res) => {
     });
   }
 
-  let {userName, password, emailAddress} = req.body;
+  let {username, password, emailAddress, firstName, lastName, type} = req.body;
 
-  return User.find({userName})
+  User.find({username})
     .count()
     .then(count => {
       if (count > 0) {
@@ -92,16 +92,19 @@ router.post('/', jsonParser, (req, res) => {
           code: 422,
           reason: 'ValidationError',
           message: 'Username already taken',
-          location: 'userName'
+          location: 'username'
         });
       }
       return User.hashPassword(password);
     })
     .then(hash => {
       return User.create({
-        userName,
+        username,
         password: hash,
-        emailAddress
+        emailAddress,
+        firstName,
+        lastName,
+        type
       });
     })
     .then(user => {

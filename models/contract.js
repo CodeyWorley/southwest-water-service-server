@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const ServiceSchema = mongoose.Schema({
+const ContractSchema = mongoose.Schema({
   customerId: {
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'Customer', 
@@ -23,8 +23,8 @@ const ServiceSchema = mongoose.Schema({
   }
 });
 
-ServiceSchema.set("timestamps", true);
-ServiceSchema.set("toJSON", {
+ContractSchema.set("timestamps", true);
+ContractSchema.set("toJSON", {
   virtuals: true,
   transform: (doc, result) => {
     delete result.__v;
@@ -32,4 +32,4 @@ ServiceSchema.set("toJSON", {
   }
 });
 
-module.exports = mongoose.model("Service", ServiceSchema);
+module.exports = mongoose.model("Contract", ContractSchema);
