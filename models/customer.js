@@ -24,7 +24,7 @@ const CustomerSchema = mongoose.Schema({
     emailAddress: {
       type: String,
       required: true,
-      unique: true
+      // unique: true
     },
     notes: {
       // {date, information}
@@ -32,7 +32,19 @@ const CustomerSchema = mongoose.Schema({
     },
     instructions: {
       type: String
-    }
+    },
+    status: {
+      type: {String, enum: ['Active', 'Inactive']},
+      required: true
+    },
+    // mailingList: {
+    //   type: Boolean,
+    //   required: true
+    // },
+    // emailingList: {
+    //   type: Boolean,
+    //   required: true
+    // }
   });
 
 CustomerSchema.set("timestamps", true);

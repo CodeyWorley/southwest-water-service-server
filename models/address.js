@@ -26,9 +26,6 @@ const AddressSchema = mongoose.Schema({
     community: {
       type: String
     },
-    notes: {
-      type: Array
-    },
     isBilling: {
       type: Boolean,
       required: true
